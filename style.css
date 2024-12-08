@@ -29,6 +29,7 @@ form {
 .form-group {
     display: flex;
     flex-direction: column;
+    
 }
 
 input, textarea, select, button {
@@ -37,7 +38,9 @@ input, textarea, select, button {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-
+textarea {
+    max-width: 780px;
+}
 button {
     background-color: #28a745;
     color: white;
@@ -68,6 +71,7 @@ th, td {
 
 th {
     background-color: #f8f8f8;
+    max-width: 400px;
 }
 
 td.priority-low {
