@@ -7,38 +7,39 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Task Management System</h1>
-        
-        <!-- Task Form -->
-        <form id="taskForm">
-            <h2>Add New Task</h2>
-            <div class="form-group">
-                <label for="taskName">Task Name:</label>
-                <input type="text" id="taskName" placeholder="Enter task name" required>
-            </div>
-            <div class="form-group">
-                <label for="taskDescription">Description:</label>
-                <textarea id="taskDescription" placeholder="Enter task description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="taskPriority">Priority:</label>
-                <select id="taskPriority">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="dueDate">Due Date:</label>
-                <input type="date" id="dueDate">
-            </div>
-            <button type="submit">Add Task</button>
-        </form>
+    <div class="window">
+        <div class="container">
+            <h1>Dashboard</h1>
 
-        <!-- Task Table -->
-        <div hidden class="task-container">
-            <h2>Task List</h2>
+            <!-- Task Form -->
+            <form id="taskForm">
+                <h2>Add New Task</h2>
+                <div class="form-group">
+                    <label for="taskName">Task Name:</label>
+                    <input type="text" id="taskName" placeholder="Enter task name" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description:</label>
+                    <textarea id="taskDescription" placeholder="Enter task description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="taskPriority">Priority:</label>
+                    <select id="taskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dueDate">Due Date:</label>
+                    <input type="date" id="dueDate">
+                </div>
+                <button type="submit">Add Task</button>
+            </form>
+            </div>
+            <!-- Task Table -->
+            <div hidden class="task-container">
+                <h2>Task List</h2>
                 <table>
                     <thead>
                         <tr>
@@ -53,6 +54,24 @@
                     <!-- Tasks will be dynamically added here -->
                     </tbody>
                 </table>
+            </div>
+            <div class="calendar">
+                <h1>Calander</h1>
+                <div class="calendar-header">
+                    <button id="prev">&#10094;</button>
+                    <h2 id="month">December 2024</h2>
+                    <button id="next">&#10095;</button>
+                </div>
+                <div class="calendar-body">
+                    <div class="grid-container">
+                        <!-- Days will be displayed as boxes -->
+                        <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div>
+                        <div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div>
+                        <div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div>
+                        <div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
+                        <div>29</div><div>30</div><div>31</div>
+                    </div>
+                </div>
             </div>
         </div>
     <script src="script.js"></script>

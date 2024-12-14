@@ -9,11 +9,15 @@ body {
     align-items: flex-start;
     min-height: 100vh;
 }
-
+.window {
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+    grid-gap: 15px;
+}
 .container {
     background: white;
-    width: 90%;
-    max-width: 800px;
+    width: calc(50% - 49px);
     margin-top: 20px;
     padding: 20px;
     border-radius: 8px;
@@ -54,7 +58,14 @@ button:hover {
 
 /* Table Styling */
 .task-container {
+    order: 1;
     overflow-x: auto;
+    background: white;
+    width: 100%;
+    padding: 20px;
+    padding-top: 0px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 table {
@@ -103,6 +114,62 @@ td.priority-high {
     opacity: 0.8;
 }
 
+.calendar {
+    background: white;
+    width: calc(50% - 49px);
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #55a7ff;
+    color: white;
+    padding: 1rem;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.calendar-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.calendar-body {
+    padding: 1rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: #e9ecef;
+}
+
+.grid-container div {
+    background: #ffffff;
+    padding: 28px 0;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.grid-container div:hover {
+    background-color: #636363;
+    color: white;
+}
 /* Responsive Design */
 @media (max-width: 600px) {
     body {
