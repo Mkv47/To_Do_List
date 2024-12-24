@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <span class="material-icons" onclick="toggleMode()">dark_mode</span>
+    <span class="material-icons" onclick="toggleMode()">wb_sunny</span>
     <div class="window">
         <div class="container">
             <h1>Task Managementk</h1>
@@ -64,7 +64,16 @@
                     <h2><span id="current-date"></h2>
                     <button id="next">&#10095;</button>
                 </div>
-                <div class="calendar-body">
+                <div class="calendar-body" id="calendar">
+                    <div class="week-Days">
+                        <div class="week-End">Sun</div>
+                        <div>Mon</div>
+                        <div>Tus</div>
+                        <div>Wen</div>
+                        <div>Thr</div>
+                        <div>Fri</div>
+                        <div class="week-End">Sat</div>
+                    </div>
                     <div class="grid-container">
                         <!-- Days will be displayed as boxes -->
                         <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div>
