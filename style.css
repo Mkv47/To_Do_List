@@ -4,11 +4,13 @@
     --accent-color: #81c784;
     --button-hover-color: #66bb6a;
     --table-bg-color: #2c2c2c;
-    --low-priority-bg-color: #2e7d32;
-    --medium-priority-bg-color: #f57f17;
-    --high-priority-bg-color: #d32f2f;
+    --task-day-bg-color: #81c784;
+    --task-hover-day-bg-color: #437a4f;
+    --low-priority-bg-color: #81c784;
+    --medium-priority-bg-color: #fa9135;
+    --high-priority-bg-color: #e57373;
     --danger-color: #e57373;
-    --current-day-bg: #405469;
+    --current-day-bg: #55a7ff;
     --edit-button-color: #55a7ff;
     --calendar-header-bg: #777777;
     --calendar-grid-hover-bg: #757575;
@@ -22,14 +24,16 @@
 body.light-mode {
     --primary-bg-color: #f0f0f0;
     --secondary-bg-color: white;
-    --accent-color: #4eb466;
+    --accent-color: #81c784;
     --button-hover-color: #258a3b;
     --table-bg-color: #f8f8f8;
+    --task-day-bg-color: #81c784;
+    --task-hover-day-bg-color: #96ffad;
     --low-priority-bg-color: #d4edda;
     --medium-priority-bg-color: #fff3cd;
     --high-priority-bg-color: #f8d7da;
     --danger-color: #fc5364;
-    --current-day-bg: #92c4fa;
+    --current-day-bg: #c0deff;
     --edit-button-color: #55a7ff;
     --calendar-header-bg: #969696;
     --calendar-grid-hover-bg: #d3d3d3;
@@ -314,8 +318,36 @@ td.priority-high {
     background-color: var(--current-day-bg);
 }
 
-.day-box.task-day {
-    background-color: #258a3b;
+.day-box.today:hover{
+    background-color:var(--edit-button-color);
+    filter: invert(0.2);
+}
+
+.day-box.low {
+    background-color: var(--low-priority-bg-color);
+}
+
+.day-box.medium {
+    background-color: var(--medium-priority-bg-color);
+}
+
+.day-box.high {
+    background-color: var(--high-priority-bg-color);
+}
+
+.day-box.low:hover {
+    background-color: var(--low-priority-bg-color);
+    filter: invert(0.2);
+}
+
+.day-box.medium:hover {
+    background-color: var(--medium-priority-bg-color);
+    filter: invert(0.2);
+}
+
+.day-box.high:hover {
+    background-color: var(--high-priority-bg-color);
+    filter: invert(0.2);
 }
 
 .calendar-body {
@@ -352,6 +384,7 @@ td.priority-high {
     background-color: var(--calendar-grid-hover-bg);
     color: white;
 }
+
 .grid-container .blank-day {
     background: var(--calendar-blank-bg);
         cursor: default;

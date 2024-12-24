@@ -61,7 +61,7 @@ function renderCalendar(date) {
             console.log(theDate , "   |   ", task.dueDate);
             if (task.dueDate == theDate) {
                 console.log(`Task with due date ${date} found:`, task);
-                dayBox.classList.add("task-day");
+                dayBox.classList.add(task.priority);
             }
             
         });
