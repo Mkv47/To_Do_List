@@ -43,6 +43,9 @@ body.light-mode {
     --view-button-bg: #969696;
     --no-color-bg: #ffffff00;
 }
+body.no-scroll {
+    overflow: hidden;
+}
 body {
     font-family: Arial, sans-serif;
     background-color: var(--primary-bg-color);
@@ -64,18 +67,53 @@ body {
     background-color: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(5px);
     display: none;
+    flex-wrap: wrap;
+    gap: 25px;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    overflow-y: auto;
 }
+
 .overlay-card {
     background-color: var(--secondary-bg-color);
     width: 400px;
     max-width: 90%;
+    max-height: 90%;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
     position: relative;
+}
+
+
+.overlay-card.low {
+    border-top: 5px solid var(--low-priority-bg-color);
+}
+
+.overlay-card.medium {
+    border-top: 5px solid var(--medium-priority-bg-color);
+}
+
+.overlay-card.high {
+    border-top: 5px solid var(--high-priority-bg-color);
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: var(--no-color-bg);
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
 }
 
 .task-description {
@@ -109,7 +147,7 @@ body {
     color: var(--font-bg-color);
 }
 
-.material-icons {
+.material-icons:not(.copy) {
     position: absolute;
     user-select: none;
     top: 0.6%;
@@ -281,6 +319,12 @@ td.priority-high {
     opacity: 0.8;
 }
 
+.actions button.material-icons {
+    background-color: var(--no-color-bg);
+    float: right;
+    font-size: 18px;
+}
+
 .calendar {
     background: var(--secondary-bg-color);
     width: 808.8px;
@@ -319,8 +363,9 @@ td.priority-high {
 }
 
 .day-box.today:hover{
-    background-color:var(--edit-button-color);
+    background-color:var(--current-day-bg);
     filter: invert(0.2);
+    color: var(--font-bg-color);
 }
 
 .day-box.low {
@@ -338,16 +383,19 @@ td.priority-high {
 .day-box.low:hover {
     background-color: var(--low-priority-bg-color);
     filter: invert(0.2);
+    color: var(--font-bg-color);
 }
 
 .day-box.medium:hover {
     background-color: var(--medium-priority-bg-color);
     filter: invert(0.2);
+    color: var(--font-bg-color);
 }
 
 .day-box.high:hover {
     background-color: var(--high-priority-bg-color);
     filter: invert(0.2);
+    color: var(--font-bg-color);
 }
 
 .calendar-body {

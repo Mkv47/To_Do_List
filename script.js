@@ -17,6 +17,7 @@ function toggleMode() { //Light Mode Toggle Function
 //###################################################################################################################################
 
 
+
 function renderCalendar(date) {
     const calendarHeader = document.querySelector("#current-date");
     const calendarGrid = document.querySelector(".grid-container");
@@ -47,18 +48,18 @@ function renderCalendar(date) {
         blankDay.textContent = (pastDaysInMonth - i);
         calendarGrid.appendChild(blankDay);
     }
+    let tDay
     for (let day = 1; day <= daysInMonth; day++) {
-        const dayBox = document.createElement("div");
-        dayBox.textContent = day;
-        dayBox.classList.add("day-box");
-
+        tDay =  day;
         if (day < 10) {
             day = '0'+day;
         }
-        const theDate = (`${year}-${month}-${day}`);
+        const dayBox = document.createElement("div");
+        dayBox.textContent = tDay;
+        dayBox.classList.add("day-box");
 
+        const theDate = (`${year}-${month}-${day}`);
         tasks.forEach(task => {
-            console.log(theDate , "   |   ", task.dueDate);
             if (task.dueDate == theDate) {
                 console.log(`Task with due date ${date} found:`, task);
                 dayBox.classList.add(task.priority);
@@ -68,7 +69,7 @@ function renderCalendar(date) {
         
         const click = new Date();
     if  (
-        day === click.getDate() &&
+        tDay === click.getDate() &&
         date.getMonth() === click.getMonth() &&
         date.getFullYear() === click.getFullYear()
     )   {
@@ -82,7 +83,7 @@ function renderCalendar(date) {
         blankDay.classList.add("blank-day");
         blankDay.textContent = (i - daysInMonth - startDay + 1);
         calendarGrid.appendChild(blankDay);
-      }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -105,7 +106,24 @@ document.addEventListener("DOMContentLoaded", function () {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar(currentDate);
     });
-  
+
+    calendarGrid.addEventListener("click", (event) => {
+        if (event.target.className != "day-box" && event.target.className != "blank-day") {
+            let day = event.target.textContent;
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
+
+            let selectedDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            let i;
+
+            tasks.forEach(task => {
+                i++;
+                if (task.dueDate === selectedDate) {
+                    createOverlay(task.id, 'elements-list');
+                }
+            });
+        }
+    });
     renderCalendar(currentDate);
 });
 
@@ -141,7 +159,7 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
     const month = (formattedDueDate.getMonth() + 1).toString().padStart(2, '0');
     const year = formattedDueDate.getFullYear();
     let formattedDueDateString = `Not assigned`;
-    if (dueDate) {
+    if (dueDate && dueDate != 'None') {
         formattedDueDateString = `${day}-${month}-${year}`
     }
     const taskList = document.getElementById('taskList');
@@ -167,6 +185,7 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
     <button class="edit" onclick="editTask(this)">Edit</button>
     <button onclick="deleteConfirmation(this)">Delete</button>
     <button class ="view" onclick="viewElement(this)">View</button>
+    <button onclick="copyElement(this)" class="material-icons copy">content_copy</button>
     </td>
     `;
 
@@ -179,7 +198,9 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
 }
 
 function deleteConfirmation(button) { //Delete Button Function
-    createOverlay(null, null, null, null, "delete", button);
+    const row = button.parentElement.parentElement
+    const id = row.dataset.taskId;
+    createOverlay(id, "delete");
     const overlayCard = document.getElementById('overlay-card')
     function handleSubmit(e) {
         e.preventDefault();
@@ -215,8 +236,9 @@ function editTask(button) { // Edit Button Function
     const taskDescription = row.children[1].textContent;
     const taskPriority = row.children[2].textContent.toLowerCase();
     const dueDate = row.children[3].textContent;
+    const id = row.dataset.taskId;
 
-    createOverlay(taskName, taskDescription, taskPriority, dueDate, 'edit');
+    createOverlay(id, 'edit');
 
     document.getElementById('overlayTaskName').value = taskName;
     document.getElementById('overlayTaskDescription').value = taskDescription === '-' ? '' : taskDescription;
@@ -231,7 +253,7 @@ function editTask(button) { // Edit Button Function
             const editedTaskPriority = document.getElementById('overlayTaskPriority').value;
             const editedDueDate = document.getElementById('overlayDueDate').value;
             if (!editedTaskName) {
-                alert('Task name is required!');
+                alert('Error: Task name is required!');
                 return;
             }
             createTask(editedTaskName, editedTaskDescription, editedTaskPriority, editedDueDate);
@@ -245,11 +267,20 @@ function editTask(button) { // Edit Button Function
 function viewElement(button) { // View Button Function
 
     const row = button.parentElement.parentElement;
+    const id = row.dataset.taskId;
+
+    createOverlay(id, "normal");
+
+}
+
+function copyElement(button)  { // copy Button Function
+
+    const row = button.parentElement.parentElement;
     const taskName = row.children[0].textContent;
     const taskDescription = row.children[1].textContent;
     const taskPriority = row.children[2].textContent.toLowerCase();
     const dueDate = row.children[3].textContent;
-    createOverlay(taskName, taskDescription, taskPriority, dueDate, "normal");
+    createTask(taskName, taskDescription, taskPriority, dueDate)
 
 }
 
@@ -261,14 +292,22 @@ function viewElement(button) { // View Button Function
 
 
 
-function createOverlay(taskName = null, taskDescription = null, taskPriority = null, dueDate = null, type = null, info = null) { // Create & Open Overlay Button Function 
-//Parameters {taskName = String, taskDescription = String, taskPriority = Low/Meduim/High, dueDate = dd/mm/yyyy, type = normal/edit}
-const overlay = document.getElementById('overlay');
+function createOverlay(id = null, type = null) { // Create & Open Overlay Button Function 
+
+    let task = tasks.find(task => String(task.id) === String(id));
+
+    taskName = task.name;
+    taskDescription = task.description;
+    taskPriority = task.priority;
+    dueDate = task.dueDate;
+
+    const overlay = document.getElementById('overlay');
     const rowOverlay = document.createElement('form');
     rowOverlay.className = 'overlay-card';
     rowOverlay.id = 'overlay-card';
     //Overlay Element To Be Created
     if (type == 'normal') {
+        rowOverlay.className = 'overlay-card '+ taskPriority;
         rowOverlay.innerHTML = `
         <button class="close-btn" onclick="closeOverlay()">&times;</button>
         <div class="overlay-content">
@@ -312,22 +351,43 @@ const overlay = document.getElementById('overlay');
             <button class="yes-btn" type="submit">Yes</button>
         </div>
         `;
+    }else if (type == 'elements-list') {
+        
+        document.body.classList.add('no-scroll');
+        rowOverlay.className = 'overlay-card '+ taskPriority;
+        rowOverlay.innerHTML = `
+        <div class="overlay-content">
+            <h1 class="task-title">${taskName}</h1>
+            <div class="task-details">
+                <p class="task-description-label"><strong>Description:</strong></p>
+                <p class="task-description">${taskDescription || 'No description available'}</p>
+                <p class="task-priority">
+                    <strong>Priority:</strong> 
+                    <span class="priority-${taskPriority}">
+                        ${taskPriority.charAt(0).toUpperCase() + taskPriority.slice(1)}
+                    </span>
+                </p>
+                <p class="task-due-date">
+                    <strong>Due Date:</strong> 
+                    <span>${dueDate || 'Not assigned'}</span>
+                </p>
+        `;
     }else {
-        alert("Type of overlay was not determined");
+        alert("Error: Type of overlay was not determined");
+        return;
     }
     
     overlay.style.display = 'flex';
-
     overlay.appendChild(rowOverlay);
 }
 
 function closeOverlay() {
     const overlay = document.getElementById('overlay');
-    const element = overlay.querySelector('.overlay-card');
-    
-    if (element) {
+    const element = overlay.querySelectorAll('.overlay-card');
+    document.body.classList.remove('no-scroll');
+    element.forEach (element => {
         element.remove();
-    }
+    });
     
     overlay.style.display = 'none';
 }
