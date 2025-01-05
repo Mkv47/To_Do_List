@@ -1,4 +1,4 @@
-:root {
+html.dark-mode {
     --primary-bg-color: #121212;
     --secondary-bg-color: #1e1e1e;
     --accent-color: #81c784;
@@ -21,7 +21,7 @@
     --no-color-bg: #ffffff00;
 }
 
-body.light-mode {
+html.light-mode {
     --primary-bg-color: #f0f0f0;
     --secondary-bg-color: white;
     --accent-color: #81c784;
@@ -63,7 +63,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% - 80px);
+    height: calc(100% - 120px);
     background-color: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(5px);
     display: none;
@@ -74,7 +74,18 @@ body {
     z-index: 1000;
     overflow-y: auto;
     padding-top: 40px;
-    padding-bottom: 40px;
+    padding-bottom: 80px;
+}
+
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    cursor: auto;
+    position: relative;
 }
 
 .overlay-card {
@@ -82,7 +93,7 @@ body {
     width: 400px;
     max-width: 90%;
     max-height: 90%;
-    padding: 20px;
+    padding: 40px;
     border-radius: 10px;
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
     position: relative;
@@ -101,6 +112,23 @@ body {
     border-top: 5px solid var(--high-priority-bg-color);
 }
 
+.overlay-no-btn{
+    display: none;
+    bottom: 0;
+    width: 6%;
+    margin-bottom: 1%;
+    justify-content: center;
+    position: fixed;
+    background-color: var(--danger-color);
+    z-index: 1000;
+    opacity: 0.3;
+}
+
+.overlay-no-btn:hover{
+    background-color: var(--danger-color);
+    opacity: 1;
+}
+
 ::-webkit-scrollbar {
     width: 4px;
     height: 8px;
@@ -116,6 +144,14 @@ body {
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
+}
+
+
+.task-title {
+    max-width: 400px;
+    display: inline-block;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .task-description {
@@ -212,7 +248,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1)
 }
 
-body.light-mode input[type="date"]::-webkit-calendar-picker-indicator {
+html.light-mode input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0)
 }
 
@@ -270,6 +306,7 @@ th, td {
     text-align: left;
     padding: 10px;
     border: 1px solid #ddd;
+    
 }
 
 th {
@@ -288,6 +325,14 @@ td.priority-medium {
 td.priority-high {
     background-color: var(--high-priority-bg-color);
 }
+
+.name{
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .description {
     max-width: 200px;
     white-space: nowrap;
@@ -444,4 +489,13 @@ td.priority-high {
 .grid-container .blank-day:hover {
     background: var(--calendar-blank-bg);
     color: #757575;
+}
+
+@media screen and (max-width: 768px) {
+    .description {
+      display: none; /* Hides the element */
+    }
+    .due-date {
+        display: none; /* Hides the element */
+      }
 }
