@@ -1,15 +1,17 @@
 let tasks = [];
 let currentDate = new Date();
 
+let LOCAL_STORAGE_KEY = 'UserID';
+let LOCAL_STORAGE_THEME = 'LightTheme';
+
 function toggleMode() { //Light Mode Toggle Function
-    document.body.classList.toggle('light-mode');
+    document.documentElement.classList.toggle('light-mode');
+    document.documentElement.classList.toggle('dark-mode');
     if (document.querySelector('.material-icons').textContent == 'dark_mode') {
         document.querySelector('.material-icons').textContent = 'wb_sunny';
     }else {
         document.querySelector('.material-icons').textContent = 'dark_mode';
     }
-}
-
     const valueToStroe = document.querySelector('.material-icons').textContent;
     localStorage.setItem(LOCAL_STORAGE_THEME, valueToStroe);
 }
