@@ -19,6 +19,7 @@ function toggleMode() { //Light Mode Toggle Function
 window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     const storedValue = localStorage.getItem(LOCAL_STORAGE_KEY);
     const theamStoredValue = localStorage.getItem(LOCAL_STORAGE_THEME);
+
     if (theamStoredValue != null) {
         document.querySelector('.material-icons').textContent = theamStoredValue;
     }else {
@@ -27,19 +28,10 @@ window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     if (!storedValue) {
         const valueToStroe = Date.now();
         localStorage.setItem(LOCAL_STORAGE_KEY, valueToStroe);
-    }else {
-        const taskData = {
-            id: storedValue,
-            name: 'dasd',
-            description: 'this',
-            priority: low,
-            due_date: '21-442-45'
-        };
-        pushTasks(taskData);
     }
-    postTasks();
+    fetchTasks();
 });
-
+  
 //Temp Code Don't Delete
 
 //async function postTasks() {
@@ -117,7 +109,6 @@ function renderCalendar(date) {
         const theDate = (`${year}-${month}-${day}`);
         tasks.forEach(task => {
             if (task.dueDate == theDate) {
-                console.log(`Task with due date ${date} found:`, task);
                 dayBox.classList.add(task.priority);
             }
             
@@ -232,11 +223,11 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
 
     //Element To Be Created
     row.innerHTML = `
-    <td>${taskName}</td>
+    <td class="name">${taskName}</td>
     <td class="description">${taskDescription || '-'}</td>
     <td class="priority-${taskPriority}">${taskPriority.charAt(0).toUpperCase() + taskPriority.slice(1)}</td>
     <td hidden>${dueDate || 'None'}</td>
-    <td>${formattedDueDateString || 'None'}</td>
+    <td class="due-date">${formattedDueDateString || 'None'}</td>
     <td class="actions">
     <button class="edit" onclick="editTask(this)">Edit</button>
     <button onclick="deleteConfirmation(this)">Delete</button>
@@ -358,6 +349,7 @@ function createOverlay(id = null, type = null) { // Create & Open Overlay Button
     dueDate = task.dueDate;
 
     const overlay = document.getElementById('overlay');
+    const content = document.getElementById('content');
     const rowOverlay = document.createElement('form');
     rowOverlay.className = 'overlay-card';
     rowOverlay.id = 'overlay-card';
@@ -367,7 +359,7 @@ function createOverlay(id = null, type = null) { // Create & Open Overlay Button
         rowOverlay.innerHTML = `
         <button class="close-btn" onclick="closeOverlay()">&times;</button>
         <div class="overlay-content">
-            <h1 class="task-title">${taskName}</h1>
+            <h1 class="task-title" class="name">${taskName}</h1>
             <div class="task-details">
                 <p class="task-description-label"><strong>Description:</strong></p>
                 <p class="task-description">${taskDescription || 'No description available'}</p>
@@ -381,6 +373,8 @@ function createOverlay(id = null, type = null) { // Create & Open Overlay Button
                     <strong>Due Date:</strong> 
                     <span>${dueDate || 'Not assigned'}</span>
                 </p>
+            </div>
+        </div>
         `;
     }else if (type == 'edit') {
         rowOverlay.innerHTML = `
@@ -408,7 +402,6 @@ function createOverlay(id = null, type = null) { // Create & Open Overlay Button
         </div>
         `;
     }else if (type == 'elements-list') {
-        
         document.body.classList.add('no-scroll');
         rowOverlay.className = 'overlay-card '+ taskPriority;
         rowOverlay.innerHTML = `
@@ -427,24 +420,27 @@ function createOverlay(id = null, type = null) { // Create & Open Overlay Button
                     <strong>Due Date:</strong> 
                     <span>${dueDate || 'Not assigned'}</span>
                 </p>
+            </div>
+        </div>
         `;
+        document.querySelector('.overlay-no-btn').style.display = 'flex';
     }else {
         alert("Error: Type of overlay was not determined");
         return;
     }
     
     overlay.style.display = 'flex';
-    overlay.appendChild(rowOverlay);
+    content.appendChild(rowOverlay);
 }
 
 function closeOverlay() {
     const overlay = document.getElementById('overlay');
     const element = overlay.querySelectorAll('.overlay-card');
     document.body.classList.remove('no-scroll');
+    document.querySelector('.overlay-no-btn').style.display = 'none';
     element.forEach (element => {
         element.remove();
     });
-    
     overlay.style.display = 'none';
 }
 
