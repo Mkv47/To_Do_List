@@ -19,7 +19,6 @@ function toggleMode() { //Light Mode Toggle Function
 window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     const storedValue = localStorage.getItem(LOCAL_STORAGE_KEY);
     const theamStoredValue = localStorage.getItem(LOCAL_STORAGE_THEME);
-
     if (theamStoredValue != null) {
         document.querySelector('.material-icons').textContent = theamStoredValue;
     }else {
@@ -28,9 +27,45 @@ window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     if (!storedValue) {
         const valueToStroe = Date.now();
         localStorage.setItem(LOCAL_STORAGE_KEY, valueToStroe);
+    }else {
+        const taskData = {
+            id: storedValue,
+            name: 'dasd',
+            description: 'this',
+            priority: low,
+            due_date: '21-442-45'
+        };
+        pushTasks(taskData);
     }
+    postTasks();
 });
-  
+
+//Temp Code Don't Delete
+
+//async function postTasks() {
+//    try {
+//      const response = await fetch("server.php");
+//      const tasks = await response.json();
+//
+//      // Populate task list
+//      console.log(tasks)
+//    } catch (error) {
+//      console.error("Error fetching tasks:", error);
+//    }
+//  }
+//
+//async function pushTasks(taskData) {
+//    const response = await fetch("server.php", {
+//        method: "POST",
+//        headers: {
+//            "Content-Type": "application/json",
+//        },
+//        body: JSON.stringify(taskData),
+//    });
+//    const result = await response.json();
+//    console.log(result.message);
+//}
+
 
 
 //###################################################################################################################################
