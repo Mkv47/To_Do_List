@@ -6,6 +6,17 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Task Management</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            const LOCAL_STORAGE_THEME = 'LightTheme';
+            const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME);
+            if (savedTheme === 'dark_mode') {
+                document.documentElement.classList.add('light-mode');
+            } else {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <span class="material-icons" onclick="toggleMode()">wb_sunny</span>
