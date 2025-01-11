@@ -28,35 +28,36 @@ window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     if (!storedValue) {
         const valueToStroe = Date.now();
         localStorage.setItem(LOCAL_STORAGE_KEY, valueToStroe);
+        window.history.pushState({}, "", valueToStroe);
+        IDENTIFY(valueToStroe);
     }
-    fetchTasks();
+    if (storedValue != 0) {
+        window.history.pushState({}, "", storedValue);
+        IDENTIFY(storedValue);
+    }
 });
-  
-//Temp Code Don't Delete
 
-//async function postTasks() {
-//    try {
-//      const response = await fetch("server.php");
-//      const tasks = await response.json();
-//
-//      // Populate task list
-//      console.log(tasks)
-//    } catch (error) {
-//      console.error("Error fetching tasks:", error);
-//    }
-//  }
-//
-//async function pushTasks(taskData) {
-//    const response = await fetch("server.php", {
-//        method: "POST",
-//        headers: {
-//            "Content-Type": "application/json",
-//        },
-//        body: JSON.stringify(taskData),
-//    });
-//    const result = await response.json();
-//    console.log(result.message);
-//}
+async function postTasks() {
+    try {
+      const response = await fetch("server/server.php");
+      const tasks = await response.json();
+
+      // Populate task list
+      console.log(tasks)
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+}
+
+async function IDENTIFY(id) {
+    const response = await fetch("server/server.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "AUTHENTICATION/json",
+        },
+        body: JSON.stringify({id: id}),
+    });
+}
 
 
 
