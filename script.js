@@ -27,12 +27,14 @@ window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     }
     if (!storedValue) {
         const valueToStroe = Date.now();
+        const newUrl = "/?id="+valueToStroe;
         localStorage.setItem(LOCAL_STORAGE_KEY, valueToStroe);
-        window.history.pushState({}, "", valueToStroe);
+        window.history.pushState({}, "", newUrl);
         IDENTIFY(valueToStroe);
     }
     if (storedValue != 0) {
-        window.history.pushState({}, "", storedValue);
+        const newUrl = "/?id="+storedValue;
+        window.history.pushState({}, "", newUrl);
         IDENTIFY(storedValue);
     }
 });
