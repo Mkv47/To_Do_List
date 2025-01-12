@@ -1,8 +1,23 @@
 let tasks = [];
 let currentDate = new Date();
 
-let LOCAL_STORAGE_KEY = 'UserID';
 let LOCAL_STORAGE_THEME = 'LightTheme';
+
+(async function manageUser() {
+    if (!localStorage.getItem('userToken')) {
+        console.log('User is Missing a token');
+        createNewUser();
+    } else {
+        const isAuthenticated = await authenticate();
+        if (isAuthenticated === true) {
+            console.log('User is valid');
+        } else {
+            localStorage.removeItem('userToken');
+            console.log('The user is not valid');
+            createNewUser();
+        }
+    }
+})();
 
 function toggleMode() { //Light Mode Toggle Function
     document.documentElement.classList.toggle('light-mode');
@@ -16,8 +31,7 @@ function toggleMode() { //Light Mode Toggle Function
     localStorage.setItem(LOCAL_STORAGE_THEME, valueToStroe);
 }
 
-window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
-    const storedValue = localStorage.getItem(LOCAL_STORAGE_KEY);
+window.addEventListener("load", () => { //Prefrence loader (Light Mode)
     const theamStoredValue = localStorage.getItem(LOCAL_STORAGE_THEME);
 
     if (theamStoredValue != null) {
@@ -25,21 +39,63 @@ window.addEventListener("load", () => { //Set an ID Type Key to Use in Back-end
     }else {
         document.querySelector('.material-icons').textContent = 'dark_mode';
     }
-    if (!storedValue) {
-        const valueToStroe = Date.now();
-        const newUrl = "/?id="+valueToStroe;
-        localStorage.setItem(LOCAL_STORAGE_KEY, valueToStroe);
-        window.history.pushState({}, "", newUrl);
-        IDENTIFY(valueToStroe);
-    }
-    if (storedValue != 0) {
-        const newUrl = "/?id="+storedValue;
-        window.history.pushState({}, "", newUrl);
-        IDENTIFY(storedValue);
-    }
 });
 
-async function postTasks() {
+async function createNewUser() {
+    const payload = {
+        type: 'create-user'
+    };
+    try {
+        const response = await fetch("server/server.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+
+        if (data.token) {
+            localStorage.setItem("userToken", data.token);
+            console.log("New user created and JWT stored:", data.token);
+
+            window.history.pushState({}, '', '/?id='+data.token);
+        } else {
+            console.error("Error creating user or generating JWT:", data.error);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+async function authenticate() {
+    const payload = {
+        type: 'authenticate-user',
+        token: localStorage.getItem('userToken')
+    };
+    try {
+        const response = await fetch("server/server.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload)
+        });
+        const auth = await response.json();
+
+        if (auth.auth === true) {
+            console.log('ture')
+            return true;
+        } else {
+            console.log('false')
+            return false;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+/*async function postTasks() {
     try {
       const response = await fetch("server/server.php");
       const tasks = await response.json();
@@ -49,17 +105,8 @@ async function postTasks() {
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
-}
+}*/
 
-async function IDENTIFY(id) {
-    const response = await fetch("server/server.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "AUTHENTICATION/json",
-        },
-        body: JSON.stringify({id: id}),
-    });
-}
 
 
 
