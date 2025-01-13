@@ -52,10 +52,11 @@ function loadUserContent($db, $userID) {
 }
 
 function addUserToDB($db, $userSignatureID) {
+    $emptyString = '[]';
     $query = "INSERT INTO Users (userID, userTasks) VALUES (:userID, :userTasks)";
     $stmt1 = $db->prepare($query);
     $stmt1->bindParam(':userID', $userSignatureID);
-    $stmt1->bindParam(':userTasks', []);
+    $stmt1->bindParam(':userTasks', $emptyString);
     if (!$stmt1->execute()) {
         echo "Error could not insert userID";
     }

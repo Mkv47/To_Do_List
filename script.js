@@ -378,6 +378,7 @@ function deleteTask(button) { //Delete Button Function
 }
 
 function editTask(button) { // Edit Button Function
+    const taskId = Date.now();
     const row = button.parentElement.parentElement;
     const taskName = row.children[0].textContent;
     const taskDescription = row.children[1].textContent;
@@ -403,7 +404,8 @@ function editTask(button) { // Edit Button Function
                 alert('Error: Task name is required!');
                 return;
             }
-            createTask(editedTaskName, editedTaskDescription, editedTaskPriority, editedDueDate);
+            addTaskToDataBase(taskId, editedTaskName, editedTaskDescription, editedTaskPriority, editedDueDate);
+            createTask(taskId, editedTaskName, editedTaskDescription, editedTaskPriority, editedDueDate);
             closeOverlay();
             deleteTask(button);
             overlayCard.removeEventListener('submit', handleSubmit)
