@@ -69,7 +69,6 @@ function addInfoToJSONField($db, $userID, $newInfo) {
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
         if ($result) {
             $userTasks = json_decode($result['userTasks'], true);
             if (!is_array($userTasks)) {
