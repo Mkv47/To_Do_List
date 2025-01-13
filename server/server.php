@@ -34,12 +34,101 @@ function verifyDataBase($db, $ID) {
     return $user !== false;
 }
 
+function loadUserContent($db, $userID) {
+    try {
+        $stmt = $db->prepare("SELECT userTasks FROM Users WHERE userID = :userID");
+        $stmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && !empty($result['userTasks'])) {
+            $userTasks = json_decode($result['userTasks'], true);
+            echo json_encode(["status" => "success", "userTasks" => $userTasks]);
+        }
+    } catch (Exception $e) {
+        echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+    }
+}
+
 function addUserToDB($db, $userSignatureID) {
     $query = "INSERT INTO Users (userID, userTasks) VALUES (:userID, :userTasks)";
     $stmt1 = $db->prepare($query);
     $stmt1->bindParam(':userID', $userSignatureID);
+    $stmt1->bindParam(':userTasks', []);
     if (!$stmt1->execute()) {
         echo "Error could not insert userID";
+    }
+}
+
+function addInfoToJSONField($db, $userID, $newInfo) {
+    try {
+        $stmt = $db->prepare("SELECT userTasks FROM Users WHERE userID = :userID");
+        $stmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+        if ($result) {
+            $userTasks = json_decode($result['userTasks'], true);
+            if (!is_array($userTasks)) {
+                $userTasks = [];
+            }
+
+            $userTasks[] = $newInfo;
+
+            $updatedTasks = json_encode($userTasks);
+            $updateStmt = $db->prepare("UPDATE Users SET userTasks = :userTasks WHERE userID = :userID");
+            $updateStmt->bindParam(':userTasks', $updatedTasks);
+            $updateStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+            if ($updateStmt->execute()) {
+                return "Info added successfully.";
+            } else {
+                return "Failed to update the record.";
+            }
+        } else {
+            return "User not found.";
+        }
+    } catch (PDOException $e) {
+        return "Database error: " . $e->getMessage();
+    }
+}
+
+function deleteTaskByID($db, $userID, $taskID) {
+    try {
+        $stmt = $db->prepare("SELECT userTasks FROM Users WHERE userID = :userID");
+        $stmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            $userTasks = json_decode($result['userTasks'], true);
+            if (!is_array($userTasks)) {
+                return "Invalid userTasks format.";
+            }
+
+            $updatedTasks = array_filter($userTasks, function ($task) use ($taskID) {
+                return $task['taskID'] !== $taskID;
+            });
+
+            $updatedTasks = array_values($updatedTasks);
+
+            $jsonTasks = json_encode($updatedTasks);
+            $updateStmt = $db->prepare("UPDATE Users SET userTasks = :userTasks WHERE userID = :userID");
+            $updateStmt->bindParam(':userTasks', $jsonTasks);
+            $updateStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+            if ($updateStmt->execute()) {
+                return "Task deleted successfully.";
+            } else {
+                return "Failed to update the record.";
+            }
+        } else {
+            return "User not found.";
+        }
+    } catch (PDOException $e) {
+        return "Database error: " . $e->getMessage();
     }
 }
 
@@ -79,13 +168,40 @@ try {
                     break;
 
                 case 'create-task':
-                    echo "Creating task with ID: " . $data['taskID'];
+                    $token = $data['token'];
+                    $ID = verifyJWT($token, $secret);
+                    if (verifyDataBase($db, $ID)) {
+                        $task = [
+                            "taskID" => $data['taskID'],
+                            "taskName" => $data['taskName'],
+                            "taskDescription" => $data['taskDescription'],
+                            "taskPriority" => $data['taskPriority'],
+                            "dueDate" => $data['dueDate']
+                        ];
+                        addInfoToJSONField($db, $ID, $task);
+                    }
                     break;
 
                 case 'delete-task':
+                    $token = $data['token'];
+                    $ID = verifyJWT($token, $secret);
+                    if (verifyDataBase($db, $ID)) {
+                        $taskID = $data['taskID'];;
+                        deleteTaskByID($db, $ID, $taskID);
+                    }
                     echo "Deleting task with ID: " . $data['taskID'];
                     break;
 
+                case 'load-content':
+                    $token = $data['token'];
+                    $ID = verifyJWT($token, $secret);
+                    if ($ID) {
+                        loadUserContent($db, $ID);
+                    } else {
+                        echo json_encode(["status" => "error", "message" => "Invalid token"]);
+                    }
+
+                    break;
                 default:
                     echo "Unknown action type.";
                     break;

@@ -5,15 +5,12 @@ let LOCAL_STORAGE_THEME = 'LightTheme';
 
 (async function manageUser() {
     if (!localStorage.getItem('userToken')) {
-        console.log('User is Missing a token');
         createNewUser();
     } else {
         const isAuthenticated = await authenticate();
         if (isAuthenticated === true) {
-            console.log('User is valid');
         } else {
             localStorage.removeItem('userToken');
-            console.log('The user is not valid');
             createNewUser();
         }
     }
@@ -39,6 +36,7 @@ window.addEventListener("load", () => { //Prefrence loader (Light Mode)
     }else {
         document.querySelector('.material-icons').textContent = 'dark_mode';
     }
+    loadUserContent();
 });
 
 async function createNewUser() {
@@ -54,12 +52,8 @@ async function createNewUser() {
             body: JSON.stringify(payload)
         });
         const data = await response.json();
-
         if (data.token) {
             localStorage.setItem("userToken", data.token);
-            console.log("New user created and JWT stored:", data.token);
-
-            window.history.pushState({}, '', '/?id='+data.token);
         } else {
             console.error("Error creating user or generating JWT:", data.error);
         }
@@ -84,10 +78,8 @@ async function authenticate() {
         const auth = await response.json();
 
         if (auth.auth === true) {
-            console.log('ture')
             return true;
         } else {
-            console.log('false')
             return false;
         }
     } catch (error) {
@@ -95,18 +87,72 @@ async function authenticate() {
     }
 }
 
-/*async function postTasks() {
+async function loadUserContent() {
+    const payload = {
+        type: 'load-content',
+        token: localStorage.getItem('userToken')
+    };
+
     try {
-      const response = await fetch("server/server.php");
-      const tasks = await response.json();
+        const response = await fetch("server/server.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
 
-      // Populate task list
-      console.log(tasks)
+        const data = await response.json();
+        if (data.status === "success") {
+            // Pass the tasks to a handler function
+            handleUserContent(data.userTasks);
+        }
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+        console.error("Error:", error);
     }
-}*/
+}
 
+async function addTaskToDataBase(currentTaskID, userInputName, userInputDescription, userInputPriority, userInputDueDate) {
+    const payload = {
+        type: 'create-task',
+        token: localStorage.getItem('userToken'),
+        taskID: currentTaskID,
+        taskName: userInputName,
+        taskDescription: userInputDescription,
+        taskPriority: userInputPriority,
+        dueDate: userInputDueDate
+    };
+    try {
+        const response = await fetch("server/server.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+async function removeTaskFromDataBase(taskID) {
+    const payload = {
+        type: 'delete-task',
+        token: localStorage.getItem('userToken'),
+        taskID: taskID
+    };
+    try {
+        const response = await fetch("server/server.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
 
 
 
@@ -234,6 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.getElementById('taskForm').addEventListener('submit', function (e) { //
     e.preventDefault();
+    const taskId = Date.now();
     const taskName = document.getElementById('taskName').value.trim();
     const taskDescription = document.getElementById('taskDescription').value.trim();
     const taskPriority = document.getElementById('taskPriority').value;
@@ -243,21 +290,20 @@ document.getElementById('taskForm').addEventListener('submit', function (e) { //
         return;
     }
 
-    /* Back-End Should Be Here To Send Elements to the Data Base*/
+    addTaskToDataBase(taskId, taskName, taskDescription, taskPriority, dueDate);
 
-    createTask(taskName, taskDescription, taskPriority, dueDate);
+    createTask(taskId, taskName, taskDescription, taskPriority, dueDate);
     this.reset();
 });
 
-function createTask(taskName, taskDescription, taskPriority, dueDate) { // This Fuction Is Used To Create Tasks Dynamically
-    const taskId = Date.now();
+function createTask(taskId, taskName, taskDescription, taskPriority, dueDate) { // This Fuction Is Used To Create Tasks Dynamically
     const formattedDueDate = new Date(dueDate);
     const day = formattedDueDate.getDate().toString().padStart(2, '0');
     const month = (formattedDueDate.getMonth() + 1).toString().padStart(2, '0');
     const year = formattedDueDate.getFullYear();
     let formattedDueDateString = `Not assigned`;
-    if (dueDate && dueDate != 'None') {
-        formattedDueDateString = `${day}-${month}-${year}`
+    if (dueDate) {
+        formattedDueDateString = `${day}-${month}-${year}`;
     }
     const taskList = document.getElementById('taskList');
     const row = document.createElement('tr');
@@ -270,14 +316,13 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
         priority: taskPriority,
         dueDate: dueDate
     });
-
     //Element To Be Created
     row.innerHTML = `
     <td class="name">${taskName}</td>
     <td class="description">${taskDescription || '-'}</td>
     <td class="priority-${taskPriority}">${taskPriority.charAt(0).toUpperCase() + taskPriority.slice(1)}</td>
-    <td hidden>${dueDate || 'None'}</td>
-    <td class="due-date">${formattedDueDateString || 'None'}</td>
+    <td hidden>${dueDate}</td>
+    <td class="due-date">${formattedDueDateString}</td>
     <td class="actions">
     <button class="edit" onclick="editTask(this)">Edit</button>
     <button onclick="deleteConfirmation(this)">Delete</button>
@@ -292,6 +337,12 @@ function createTask(taskName, taskDescription, taskPriority, dueDate) { // This 
     taskList.appendChild(row);
     
     renderCalendar(currentDate);
+}
+
+function handleUserContent(UserTasks) {
+    UserTasks.forEach(task => {
+        createTask(task.taskID, task.taskName, task.taskDescription, task.taskPriority, task.dueDate)
+    });
 }
 
 function deleteConfirmation(button) { //Delete Button Function
@@ -311,11 +362,10 @@ function deleteConfirmation(button) { //Delete Button Function
 
 function deleteTask(button) { //Delete Button Function
     const row = button.parentElement.parentElement;
-
-    /* Back-End Should Be Here To Delete Elements From The Data Base */
     
     tasks.forEach((task, index) => {
         if (task.id == row.getAttribute('data-task-id')) {
+            removeTaskFromDataBase(task.id);
             tasks.splice(index, 1);
         };
     });
@@ -365,20 +415,20 @@ function viewElement(button) { // View Button Function
 
     const row = button.parentElement.parentElement;
     const id = row.dataset.taskId;
-
     createOverlay(id, "normal");
-
 }
 
 function copyElement(button)  { // copy Button Function
 
     const row = button.parentElement.parentElement;
+    const taskId = Date.now();
     const taskName = row.children[0].textContent;
     const taskDescription = row.children[1].textContent;
     const taskPriority = row.children[2].textContent.toLowerCase();
     const dueDate = row.children[3].textContent;
-    createTask(taskName, taskDescription, taskPriority, dueDate)
 
+    addTaskToDataBase(taskId, taskName, taskDescription, taskPriority, dueDate);
+    createTask(taskId, taskName, taskDescription, taskPriority, dueDate)
 }
 
 
