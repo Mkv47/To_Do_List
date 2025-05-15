@@ -7,7 +7,13 @@ A simple, responsive web-based To-Do List application built with HTML, CSS, and 
 - Add, edit, and delete tasks  
 - Mark tasks as completed  
 - Persistent storage using browser localStorage  
-- Responsive design for desktop and mobile  
+- Responsive design for desktop and mobile
+
+## Backend Support
+
+This project includes backend functionality to handle data storage and user management. However, since GitHub Pages serves only static sites, the backend won't run here.
+
+To fully utilize backend features, deploy the backend on a server or use a local development environment.
 
 ## Demo
 
